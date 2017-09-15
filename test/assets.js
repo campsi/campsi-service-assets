@@ -9,6 +9,7 @@ const chaiHttp = require('chai-http');
 const CampsiServer = require('campsi');
 const config = require('config');
 const {MongoClient} = require('mongodb');
+const fs = require('fs');
 
 let campsi;
 
@@ -40,7 +41,7 @@ describe('Assets API', () => {
         });
     });
     /*
-     * Test the /GET providers route
+     * Test the /GET / route
      */
     describe('/GET /', () => {
         it('it should return a list of assets', (done) => {
@@ -57,6 +58,21 @@ describe('Assets API', () => {
                     res.body.should.have.property('assets');
                     res.body.assets.should.be.an('array');
                     res.body.assets.length.should.be.eq(0);
+                    done();
+                });
+        });
+    });
+    /*
+     * Test the /GET / route
+     */
+    describe('/POST /', () => {
+        it('it should return ids of uploaded files', (done) => {
+            chai.request(campsi.app)
+                .post('/assets')
+                .attach('file', fs.readFileSync('test/rsrc/logo_agilitation.png'), 'logo_agilitation.png')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.json;
                     done();
                 });
         });
