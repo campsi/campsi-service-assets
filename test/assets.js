@@ -153,4 +153,40 @@ describe('Assets API', () => {
                 });
         });
     });
+    /*
+     * Test the /GET /:asset/metadata route
+     */
+    describe('/GET /:asset/metadata', () => {
+        it('it should return the asset metadata', (done) => {
+            createAsset('./test/rsrc/logo_agilitation.png')
+                .then((asset) => {
+                    chai.request(campsi.app)
+                        .get('/assets/' + asset.id + '/metadata')
+                        .end((err, res) => {
+                            res.should.have.status(200);
+                            res.should.be.json;
+                            // TODO test metadata
+                            done();
+                        });
+                });
+        });
+    });
+    /*
+     * Test the /DELETE /:asset route
+     */
+    describe('/DELETE /:asset', () => {
+        it('it should return the asset metadata', (done) => {
+            createAsset('./test/rsrc/logo_agilitation.png')
+                .then((asset) => {
+                    chai.request(campsi.app)
+                        .delete('/assets/' + asset.id)
+                        .end((err, res) => {
+                            res.should.have.status(200);
+                            res.should.be.json;
+                            // TODO test deletion and return
+                            done();
+                        });
+                });
+        });
+    });
 });
