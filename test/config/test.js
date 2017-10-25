@@ -21,6 +21,7 @@ module.exports = {
         assets: {
             title: 'Médias',
             kind: 'assets',
+            namespace: 'test-ns',
             options: {
                 roles: ['public', 'admin'],
                 order: ['local'],

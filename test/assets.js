@@ -11,10 +11,13 @@ const config = require('config');
 const {MongoClient} = require('mongodb');
 const fs = require('fs');
 const path = require('path');
+const uniqueSlug = require('unique-slug');
 const mime = require('mime-types');
 const rimraf = require('rimraf');
+const async = require('async');
 
 let campsi;
+let server;
 
 chai.use(chaiHttp);
 chai.should();
@@ -28,12 +31,13 @@ function createAsset(source) {
     return new Promise(function (resolve, reject) {
 
         const localStorage = campsi.services.get('assets').config.options.storages.local;
-        const filename = path.basename(source);
+        const originalName = path.basename(source);
+        const storageName = uniqueSlug('');
         const stats = fs.statSync(source);
 
         let file = {
             fieldName: 'file',
-            originalName: filename,
+            originalName: originalName,
             clientReportedMimeType : mime.lookup(source),
             clientReportedFileExtension: path.extname(source),
             path: '',
@@ -56,18 +60,28 @@ function createAsset(source) {
 
         localStorage.destination().then((destination) => {
             file.destination = destination;
-            file.path = path.join(file.destination.abs, filename);
-            file.url = localStorage.options.baseUrl + '/local/' + file.destination.rel + '/' + filename;
+            file.path = path.join(file.destination.abs, storageName);
+            file.url = '/local/' + file.destination.rel + '/' + storageName;
 
             fs.writeFileSync(file.path, fs.readFileSync(source));
 
-            campsi.db.collection('__assets__').insertOne(file)
+            campsi.services.get('assets').collection.insertOne(file)
                 .then((result) => {
                     resolve({
                         id: result.insertedId.toString(),
-                        path: '/local/' + file.destination.rel + '/' + filename
+                        path: '/local/' + file.destination.rel + '/' + storageName
                     });
                 }).catch((err) => reject(err));
+        });
+    });
+}
+
+function createAssets(files) {
+    return new Promise((resolve) => {
+        async.each(files, (file, cb) => {
+            createAsset(file).then(cb);
+        }, () => {
+            resolve();
         });
     });
 }
@@ -83,6 +97,7 @@ describe('Assets API', () => {
                 campsi.mount('assets', new services.Assets(config.services.assets));
 
                 campsi.on('ready', () => {
+                    server = campsi.listen(config.port);
                     done();
                 });
 
@@ -97,26 +112,32 @@ describe('Assets API', () => {
             });
         });
     });
+
+    afterEach((done) => {
+        server.close();
+        done();
+    });
     /*
      * Test the /GET / route
      */
     describe('/GET /', () => {
         it('it should return a list of assets', (done) => {
-            chai.request(campsi.app)
-                .get('/assets')
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.should.be.json;
-                    res.body.should.be.an('object');
-                    res.body.should.have.property('count');
-                    res.body.count.should.be.eq(0);
-                    res.body.should.have.property('hasNext');
-                    res.body.hasNext.should.be.eq(false);
-                    res.body.should.have.property('assets');
-                    res.body.assets.should.be.an('array');
-                    res.body.assets.length.should.be.eq(0);
-                    done();
+            createAssets(Array(5).fill('./test/rsrc/logo_agilitation.png'))
+                .then(() => {
+                    chai.request(campsi.app)
+                        .get('/assets/')
+                        .query({page:3, perPage:2})
+                        .end((err, res) => {
+                            res.should.have.status(200);
+                            res.should.have.header('x-total-count', '5');
+                            res.should.have.header('link');
+                            res.should.be.json;
+                            res.body.should.be.an('array');
+                            res.body.length.should.be.eq(1);
+                            done();
+                        });
                 });
+
         });
     });
     /*
@@ -137,12 +158,12 @@ describe('Assets API', () => {
     /*
      * Test the /GET /local route
      */
-    describe('/GET /local', () => {
+    describe('/GET /assets/<asset>', () => {
         it('it should return local asset', (done) => {
             createAsset('./test/rsrc/logo_agilitation.png')
                 .then((asset) => {
                     chai.request(campsi.app)
-                        .get('/assets' + asset.path)
+                        .get('/assets/{0}'.format(asset.id))
                         .end((err, res) => {
                             res.should.have.status(200);
                             res.should.have.header('content-type', 'image/png');
@@ -161,7 +182,7 @@ describe('Assets API', () => {
             createAsset('./test/rsrc/logo_agilitation.png')
                 .then((asset) => {
                     chai.request(campsi.app)
-                        .get('/assets/' + asset.id + '/metadata')
+                        .get('/assets/{0}/metadata'.format(asset.id))
                         .end((err, res) => {
                             res.should.have.status(200);
                             res.should.be.json;

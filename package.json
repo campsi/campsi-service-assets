@@ -11,8 +11,11 @@
     "async": "^2.4.1",
     "aws-sdk": "^2.63.0",
     "debug": "^2.6.8",
+    "for-in": "^1.0.2",
     "mkdirp": "^0.5.1",
-    "multer": "git://github.com/expressjs/multer.git#explore-new-api"
+    "multer": "git://github.com/expressjs/multer.git#explore-new-api",
+    "string-format": "^0.5.0",
+    "unique-slug": "^2.0.0"
   },
   "devDependencies": {
     "campsi": "git://github.com/campsi/campsi.git",
@@ -31,12 +34,23 @@
     "path": "^0.12.7",
     "rimraf": "^2.6.2"
   },
+  "altDependencies": {
+    "dev": {
+      "campsi": "file:../campsi"
+    },
+    "test": {
+      "campsi": "git://github.com/campsi/campsi.git"
+    },
+    "release": {
+      "campsi": "^0.1.0"
+    }
+  },
   "scripts": {
-    "cover": "istanbul cover _mocha",
+    "cover": "istanbul cover _mocha \"./test/**/!(index).js\"",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls",
     "depcheck": "depcheck --ignores=path,mocha-lcov-reporter",
     "lint": "./node_modules/eslint/bin/eslint.js --cache lib/** test/**",
-    "test": "mocha"
+    "test": "mocha \"./test/**/!(index).js\""
   },
   "author": "",
   "license": "MIT",
