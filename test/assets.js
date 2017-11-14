@@ -96,7 +96,7 @@ describe('Assets API', () => {
                 campsi = new CampsiServer(config.campsi);
                 campsi.mount('assets', new services.Assets(config.services.assets));
 
-                campsi.on('ready', () => {
+                campsi.on('campsi/ready', () => {
                     server = campsi.listen(config.port);
                     done();
                 });

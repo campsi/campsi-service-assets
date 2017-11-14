@@ -13,7 +13,7 @@ let campsi = new CampsiServer(config.campsi);
 
 campsi.mount('assets', new services.Assets(config.services.assets));
 
-campsi.on('ready', () => {
+campsi.on('campsi/ready', () => {
     debug('ready');
     campsi.listen(config.port);
 });
