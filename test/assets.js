@@ -114,8 +114,9 @@ describe('Assets API', () => {
     });
 
     afterEach((done) => {
-        server.close();
-        done();
+        server.close(() => {
+            done();
+        });
     });
     /*
      * Test the /GET / route
