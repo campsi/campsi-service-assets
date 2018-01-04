@@ -8,7 +8,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const CampsiServer = require('campsi');
 const config = require('config');
-const {MongoClient} = require('mongodb');
+const {MongoClient, Server} = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const uniqueSlug = require('unique-slug');
@@ -90,9 +90,11 @@ describe('Assets API', () => {
     beforeEach((done) => {
 
         // Empty the database
-        MongoClient.connect(config.campsi.mongoURI).then((db) => {
+        let client = new MongoClient(new Server(config.campsi.mongo.host, config.campsi.mongo.port));
+        client.connect((error, mongoClient) => {
+            let db = mongoClient.db(config.campsi.mongo.name);
             db.dropDatabase(() => {
-                db.close();
+                client.close();
                 campsi = new CampsiServer(config.campsi);
                 campsi.mount('assets', new services.Assets(config.services.assets));
 
