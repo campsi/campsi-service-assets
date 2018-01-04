@@ -16,6 +16,11 @@ module.exports = {
     title: 'Test Assets',
     campsi: {
         mongoURI: 'mongodb://localhost:27017/relationships',
+        mongo: {
+            host: 'localhost',
+            port: 27017,
+            name: 'relationships'
+        }
     },
     services: {
         assets: {
