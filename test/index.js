@@ -22,9 +22,8 @@ process.on('uncaughtException', function () {
     debug('uncaughtException');
 });
 
-process.on('unhandledRejection', (reason) => {
-    debug('unhandledRejection');
-    debug(reason);
+process.on('unhandledRejection', (reason, p) => {
+    debug('Unhandled Rejection at:', p, 'reason:', reason);
     process.exit(1);
 });
 
