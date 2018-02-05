@@ -12,20 +12,18 @@ const storageProviders = {
 
 module.exports = {
     port: 3000,
-    host: host,
-    title: 'Test Assets',
     campsi: {
+        title: 'Test Assets',
+        publicURL: host,
         mongo: {
             host: 'localhost',
             port: 27017,
-            database: 'relationships'
+            database: 'test-campsi-service-assets'
         }
     },
     services: {
         assets: {
             title: 'Médias',
-            kind: 'assets',
-            namespace: 'test-ns',
             options: {
                 roles: ['public', 'admin'],
                 order: ['local'],
