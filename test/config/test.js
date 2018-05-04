@@ -1,6 +1,6 @@
 const path = require('path');
 const LocalAssetStorage = require('../../lib/storages/local');
-const host = 'http://localhost:3000';
+const host = 'http://localhost:3006';
 const storageProviders = {
     local: new LocalAssetStorage({
         name: 'local',
@@ -11,7 +11,7 @@ const storageProviders = {
 };
 
 module.exports = {
-    port: 3000,
+    port: 3006,
     host: host,
     title: 'Test Assets',
     campsi: {
