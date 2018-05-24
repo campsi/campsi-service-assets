@@ -1,6 +1,6 @@
 const path = require('path');
 const LocalAssetStorage = require('../../lib/storages/local');
-const host = 'http://localhost:3006';
+const host = 'http://localhost:3000';
 const storageProviders = {
   local: new LocalAssetStorage({
     name: 'local',
