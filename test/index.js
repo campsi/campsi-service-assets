@@ -14,7 +14,7 @@ let campsi = new CampsiServer(config.campsi);
 campsi.mount('assets', new services.Assets(config.services.assets));
 
 campsi.on('campsi/ready', () => {
-  debug('ready');
+  debug(`ready, listening on port ${config.port}`);
   campsi.listen(config.port);
 });
 
