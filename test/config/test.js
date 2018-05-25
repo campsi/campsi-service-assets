@@ -25,6 +25,7 @@ module.exports = {
     assets: {
       title: 'Médias',
       options: {
+        allowPublicListing: true,
         roles: ['public', 'admin'],
         order: ['local'],
         fallback: 'local',
