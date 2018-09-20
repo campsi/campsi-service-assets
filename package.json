@@ -15,7 +15,7 @@
     "mkdirp": "^0.5.1",
     "multer": "^2.0.0-alpha.6",
     "string-format": "^2.0.0",
-    "unique-slug": "^2.0.0"
+    "unique-slug": "^2.0.1"
   },
   "devDependencies": {
     "campsi": "^1.0.6",
